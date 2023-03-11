@@ -48,7 +48,7 @@ class BacktestBarFeed(DataFeed):
             )
             LOG.info(f"Pushed {event}")
             self.bus.push(event)
-
+        
     def start(self):
         self.thread.start()
 
@@ -81,12 +81,3 @@ class DummyBarFeed(DataFeed):
             )
             LOG.debug(f"DummyBarFeed pushed {event}")
             self.bus.push(event)
-
-
-if __name__ == '__main__':
-
-    file = "/Users/zhewang/Projects/2023/event-driven-trading/simple/data/future/BTCUSDT/agg/5m/2023-2023-5m-BTCUSDT.parquet"
-    bus = EventBus(sample_freq=0.05)
-    feed = BacktestBarFeed(bus, file)
-    feed._run()
-    # feed.start()

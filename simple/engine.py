@@ -91,8 +91,7 @@ class Strategy:
         self.bus = bus
 
     def on_bar(self, bar: Bar):
-        latency = datetime.now() - bar.timestamp
-        LOG.info(f"Strategy reveived {bar} with latency {latency.microseconds / 1000} ms")
+        LOG.info(f"Strategy reveived {bar}")
         LOG.info(f"Computing some fancy signal ...")
         LOG.info(f"Submit Order...")
         self.submit_order()

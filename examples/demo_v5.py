@@ -1,5 +1,5 @@
 from simple.engine import Strategy, DummyExecution, Engine
-from simple.data.core import DummyBarFeed, BacktestBarFeed
+from simple.data.core import BacktestBarFeed
 from simple.event_bus import EventBus
 
 if __name__ == "__main__":

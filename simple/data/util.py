@@ -144,7 +144,7 @@ def load_raw_zip(symbol: str, freq: str, base: str) -> pd.DataFrame:
             df["open_time"] = pd.to_datetime(df["open_time"], unit="ms")
             df["close_time"] = pd.to_datetime(df["close_time"], unit="ms")
 
-        df = df.set_index("open_time", drop=True)
+        df = df.set_index("close_time", drop=True)
         dfs.append(df)
 
     res = pd.concat(dfs).sort_index()
@@ -160,26 +160,36 @@ def parquet_file(symbol: str, freq: str, start: int, end: int, base: str):
 if __name__ == "__main__":
     # Download raw zip files and dump a single parquet file
     base = "./future"  # change the target folder to host the files
-    start = 2023
+    start = 2020
     end = 2023
     freq = "5m"
-    # universe = ["BTCUSDT", "ETHUSDT", "XRPUSDT", "BNBUSDT", "ADAUSDT", "DOGEUSDT"]
+    universe = ["BTCUSDT", "ETHUSDT", "XRPUSDT", "BNBUSDT", "ADAUSDT", "DOGEUSDT", "LTCUSDT", "1000SHIBUSDT", "SOLUSDT", "DOTUSDT"]
+
+    for symbol in universe:
+        # download(symbol, freq, start, end, base, max_worker=5, type="future")
+        # Dump parquet file
+        df = load_raw_zip(symbol, freq, base)
+        file_path = f"{symbol}/agg/{freq}/{start}-{end}-{freq}-{symbol}.parquet"
+        parquet_path = (
+            f"{base}/{file_path}"
+        )
+        os.makedirs(os.path.dirname(parquet_path), exist_ok=True)
+        df.to_parquet(parquet_path)
+
+    # Combine to cross sectional dataframe
+    symbols = ["open", "high", "low", "close", "volume", "num_trades", "quote_asset_vol"]
+    for field in symbols:
+        print(f">> {field}")
+        datas = []
+        for name in universe:
+            file = parquet_file(name, freq, start, end, base)
+            df = pd.read_parquet(parquet_file(name, freq, start, end, base))
+            data = df[field]
+            datas.append(data)
+        
+        data = pd.concat(datas, axis=1, keys=universe)
+        data.to_parquet(f"./future/processed/{field}.parquet")
+
     # universe = ["BTCUSDT"]
     # for symbol in universe:
-    #     download(symbol, freq, start, end, base, max_worker=5, type="future")
-    #     # Dump parquet file
-    #     df = load_raw_zip(symbol, freq, base)
-    #     file_path = f"{symbol}/agg/{freq}/{start}-{end}-{freq}-{symbol}.parquet"
-    #     parquet_path = (
-    #         f"{base}/{file_path}"
-    #     )
-    #     os.makedirs(os.path.dirname(parquet_path), exist_ok=True)
-    #     df.to_parquet(parquet_path)
-
-    # # Load paruqet history data
-    # btc = pd.read_parquet(parquet_file("BTCUSDT", freq, start, end, base))
-    # print(btc)
-
-    universe = ["BTCUSDT"]
-    for symbol in universe:
-        download_trade(symbol, start, end, base, max_worker=5, type="future")
+    #     download_trade(symbol, start, end, base, max_worker=5, type="future")
