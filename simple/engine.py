@@ -1,4 +1,5 @@
 from __future__ import annotations  # the FUTURE of annotation...hah 
+
 from collections import defaultdict
 from typing import Any, Dict, List, Callable
 from abc import ABC, abstractmethod
@@ -7,7 +8,9 @@ from time import sleep
 import logging
 from threading import Thread
 
+from simple.event_bus import EventBus
 from simple.model import Event, EventType, Bar, Order, Trade, OrderType, Asset, AssetType
+from simple.data.core import DataFeed
 
 
 LOG = logging.getLogger(__name__)
@@ -35,78 +38,6 @@ class Engine:
         
         while True:
             sleep(0.05)
-
-
-class EventBus:
-
-    def __init__(self, sample_freq: float=0.2):
-        self.topics: Dict[EventType, List[Callable]] = defaultdict(list)   # TODO: Could be a priority queue
-        self.events: List[Event] = list()
-        self.sample_freq = sample_freq
-        self.thread = Thread(target=self.blocking_run)
-    
-    def subscribe(self, event_type: EventType, callback: Callable):
-        LOG.debug(f"Subscribe {event_type} with {callback}")
-        self.topics[event_type].append(callback)  # TODO: could be duplicated callbacks.
-
-    def push(self, event: Event):
-        self.events.append(event)
-
-    def blocking_run(self):
-        """ blocking run """
-        while True:
-            while self.events:
-                event = self.events.pop()
-                _callables = self.topics[event.type]
-                for _callable in _callables:
-                    _callable(event.payload)
-            
-            sleep(self.sample_freq)  # sample frequency to avoid throttling the CPU.
-
-    def start(self):
-        """ Async run """
-        LOG.info(f"EventBus thread starting...")
-        self.thread.start()
-
-    def stop(self):
-        self.thread.join()
-
-
-class DataFeed(ABC):
-
-    @abstractmethod
-    def start(self):
-        ...
-
-
-class DummyBarFeed(DataFeed):
-    # Does Bar feed needs to know EventBus?
-
-    def __init__(self, bus: EventBus) -> None:
-        self.bus = bus
-        self.thread = Thread(target=self._run)
-
-    def start(self):
-        LOG.info(f"{self} thread starting...")
-        self.thread.start()
-
-    def _run(self):
-        while True:
-            sleep(2)
-            bar = Bar(
-                open=100,
-                high=200,
-                low=100,
-                close=100,
-                volume=20000,
-                timestamp=datetime.now()
-            )
-            event = Event(
-                type=EventType.BAR,
-                payload=bar
-            )
-            LOG.debug(f"DummyBarFeed pushed {event}")
-            self.bus.push(event)
 
 
 class Execution(ABC):
@@ -160,8 +91,7 @@ class Strategy:
         self.bus = bus
 
     def on_bar(self, bar: Bar):
-        latency = datetime.now() - bar.timestamp
-        LOG.info(f"Strategy reveived {bar} with latency {latency.microseconds / 1000} ms")
+        LOG.info(f"Strategy reveived {bar}")
         LOG.info(f"Computing some fancy signal ...")
         LOG.info(f"Submit Order...")
         self.submit_order()

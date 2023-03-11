@@ -10,7 +10,7 @@ packages = [{include = "simple"}]
 python = "^3.8"
 pandas = "^1.5.3"
 fastparquet = "^2023.2.0"
-
+polars = "^0.16.10"
 
 [build-system]
 requires = ["poetry-core"]

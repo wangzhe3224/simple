@@ -26,6 +26,7 @@ framework to do backtesting and live trading.
   - [V2 Add Execution](#v2-add-execution)
   - [V3 Make project a proper Python project structure](#v3-make-project-a-proper-python-project-structure)
   - [V4 Data - Util](#v4-data---util)
+  - [V5 Data - Backtest](#v5-data---backtest)
   - [Buy me a coffee?](#buy-me-a-coffee)
 
 ## 路线图
@@ -33,9 +34,9 @@ framework to do backtesting and live trading.
 - [x] v1 100行代码最小化框架
 - [x] v2 200行代码增加执行模块接口
 - [x] v3 改进项目的组织架构
-- [ ] 数据
-    - [ ] 加密货币分时历史数据
-    - [ ] 分式数据模块
+- [x] 数据
+    - [x] 加密货币分时历史数据
+    - [x] 分式数据模块
 - [ ] 回测
     - [ ] 策略接口和示范
     - [ ] 回测模拟执行模块
@@ -100,6 +101,14 @@ Check git tag v2 to see the code.
 [Diff v4](https://github.com/wangzhe3224/simple/compare/v3...v4)
 
 [>> 视频讲解 v4 <<](https://www.youtube.com/watch?v=hfaIaRvQpe4)
+
+## V5 Data - Backtest
+
+上一部分我们实现了多线程下载历史数据，现在我们利用下载的分时数据吗，要实现一个回测的数据源。
+
+[Diff v5](https://github.com/wangzhe3224/simple/compare/v4...v5)
+
+[>> 视频讲解 v5 <<](https://www.youtube.com/watch?v=bqMlTduJb44)
 
 ## Buy me a coffee?
 
